@@ -1,0 +1,172 @@
+#VRML_SIM R2025a utf8
+# Savannah and woodland terrain for OFF TOUR.
+# Height field follows the forest_firefighters UnevenForest Perlin noise,
+# written for Webots R2025 ENU (height along Z, no Y-up rotation).
+# West side is open savannah (acacia). East side is denser woodland (sassafras).
+# template language: javascript
+
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/appearances/protos/SandyGround.proto"
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/objects/trees/protos/Sassafras.proto"
+EXTERNPROTO "Acacia.proto"
+EXTERNPROTO "BushFire.proto"
+
+PROTO SavannahRange [
+  field SFVec3f  translation  0 0 0
+  field SFString name         "savannah range"
+  field SFVec2f  size         80 80
+  field SFFloat  relief       6
+  field SFInt32  randomSeed   2
+]
+{
+  %<
+    import * as wbrandom from 'wbrandom.js';
+
+    wbrandom.seed(fields.randomSeed.value);
+
+    function gaussian2d(x, y, amp, cx, cy, sx, sy) {
+      return amp * Math.exp(-((Math.pow(x - cx, 2) / (2.0 * Math.pow(sx, 2))) + (Math.pow(y - cy, 2) / (2.0 * Math.pow(sy, 2)))));
+    }
+
+    let perm = [];
+    for (let i = 1; i <= 256; ++i)
+      perm.splice(wbrandom.integer(i) - 1, 0, i);
+    for (let i = 0; i < 256; ++i)
+      perm.push(perm[i]);
+
+    let dirs = [];
+    for (let a = 0; a < 256; ++a)
+      dirs.push([Math.cos(a * 2.0 * Math.PI / 256), Math.sin(a * 2.0 * Math.PI / 256)]);
+
+    function noise(x, y, per) {
+      function surflet(grid_x, grid_y) {
+        const dist_x = Math.abs(x - grid_x);
+        const dist_y = Math.abs(y - grid_y);
+        const poly_x = 1 - 6 * Math.pow(dist_x, 5) + 15 * Math.pow(dist_x, 4) - 10 * Math.pow(dist_x, 3);
+        const poly_y = 1 - 6 * Math.pow(dist_y, 5) + 15 * Math.pow(dist_y, 4) - 10 * Math.pow(dist_y, 3);
+        const hashed = perm[(perm[(Math.floor(grid_x) % per)] + Math.floor(grid_y) % per)];
+        const grad = (x - grid_x) * dirs[hashed - 1][0] + (y - grid_y) * dirs[hashed - 1][1];
+        return poly_x * poly_y * grad;
+      }
+      const int_x = Math.floor(x);
+      const int_y = Math.floor(y);
+      return surflet(int_x, int_y) + surflet(int_x + 1, int_y) + surflet(int_x, int_y + 1) + surflet(int_x + 1, int_y + 1);
+    }
+
+    function fBm(x, y, per, octs) {
+      let val = 0;
+      for (let o = 0; o < octs; ++o)
+        val += Math.pow(0.5, o) * noise(x * Math.pow(2, o), y * Math.pow(2, o), per * Math.pow(2, o));
+      return val;
+    }
+
+    const xDimension = 28;
+    const yDimension = 28;
+    const sizeX = fields.size.value.x;
+    const sizeY = fields.size.value.y;
+    const relief = fields.relief.value;
+    const perlinSize = 128;
+    let heights = [];
+    for (let j = 0; j < yDimension; ++j) {
+      for (let i = 0; i < xDimension; ++i) {
+        const x = i / (xDimension - 1);
+        const y = j / (yDimension - 1);
+        let height = 0.5 * (1.0 + fBm(x, y, perlinSize, 3));
+        const dist = Math.hypot(x - 0.5, y - 0.5);
+        if (dist < 0.1)
+          height = 0;
+        else
+          height = height * (1.0 - gaussian2d(x - 0.5, y - 0.5, 1, 0, 0, 0.18, 0.18));
+        heights.push(height * relief);
+      }
+    }
+
+    function heightAt(x, y) {
+      const xIndex = (x / sizeX) * (xDimension - 1);
+      const yIndex = (y / sizeY) * (yDimension - 1);
+      const x1 = Math.max(0, Math.min(xDimension - 2, Math.floor(xIndex)));
+      const y1 = Math.max(0, Math.min(yDimension - 2, Math.floor(yIndex)));
+      const dx = xIndex - x1;
+      const dy = yIndex - y1;
+      const h00 = heights[x1 + y1 * xDimension];
+      const h10 = heights[(x1 + 1) + y1 * xDimension];
+      const h01 = heights[x1 + (y1 + 1) * xDimension];
+      const h11 = heights[(x1 + 1) + (y1 + 1) * xDimension];
+      const h0 = h00 * (1 - dx) + h10 * dx;
+      const h1 = h01 * (1 - dx) + h11 * dx;
+      return h0 * (1 - dy) + h1 * dy;
+    }
+
+    let acacias = [];
+    let woods = [];
+    for (let n = 0; n < 40; ++n) {
+      const x = wbrandom.real(4, sizeX - 4);
+      const y = wbrandom.real(4, sizeY - 4);
+      const dx = x - sizeX * 0.5;
+      const dy = y - sizeY * 0.5;
+      if (dx * dx + dy * dy < 20 * 20)
+        continue;
+      const z = heightAt(x, y);
+      const angle = wbrandom.real(0, 2 * Math.PI);
+      if (x < sizeX * 0.38)
+        acacias.push({x: x, y: y, z: z, angle: angle, canopy: wbrandom.real(3.2, 5.2)});
+      else if (x > sizeX * 0.68)
+        woods.push({x: x, y: y, z: z, angle: angle});
+    }
+
+    const fireSavannah = {x: 14, y: 52};
+    fireSavannah.z = heightAt(fireSavannah.x, fireSavannah.y);
+    const fireWood = {x: 62, y: 22};
+    fireWood.z = heightAt(fireWood.x, fireWood.y);
+  >%
+  Solid {
+    translation IS translation
+    name IS name
+    children [
+      Shape {
+        appearance SandyGround {
+          colorOverride 0.78 0.66 0.36
+          textureTransform TextureTransform {
+            scale 16 16
+          }
+        }
+        geometry DEF RANGE_GRID ElevationGrid {
+          xDimension %<= xDimension >%
+          xSpacing %<= sizeX / (xDimension - 1) >%
+          yDimension %<= yDimension >%
+          ySpacing %<= sizeY / (yDimension - 1) >%
+          height [
+            %< for (let h = 0; h < heights.length; ++h) { >%
+              %<= heights[h] >%
+            %< } >%
+          ]
+        }
+      }
+      %< for (let i = 0; i < acacias.length; ++i) { >%
+      Acacia {
+        translation %<= acacias[i].x >% %<= acacias[i].y >% %<= acacias[i].z >%
+        rotation 0 0 1 %<= acacias[i].angle >%
+        name %<= '"acacia_' + i + '"' >%
+        canopy %<= acacias[i].canopy >%
+      }
+      %< } >%
+      %< for (let i = 0; i < woods.length; ++i) { >%
+      Sassafras {
+        translation %<= woods[i].x >% %<= woods[i].y >% %<= woods[i].z >%
+        rotation 0 0 1 %<= woods[i].angle >%
+        name %<= '"sassafras_' + i + '"' >%
+      }
+      %< } >%
+      BushFire {
+        translation %<= fireSavannah.x >% %<= fireSavannah.y >% %<= fireSavannah.z >%
+        name "bushfire_savannah"
+        intensity 10
+      }
+      BushFire {
+        translation %<= fireWood.x >% %<= fireWood.y >% %<= fireWood.z >%
+        name "bushfire_woodland"
+        intensity 8
+      }
+    ]
+    boundingObject USE RANGE_GRID
+  }
+}

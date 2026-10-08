@@ -1,0 +1,93 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/objects/factory/manhole/protos/SquareManhole.proto"
+EXTERNPROTO "../protos/Mavic2ProLocal.proto"
+EXTERNPROTO "../protos/SavannahRange.proto"
+
+WorldInfo {
+  info [
+    "OFF TOUR savannah built like forest_firefighters:"
+    "Perlin elevation, sassafras woodland on the east, open acacia savannah on the west."
+    "Two Mavic 2 Pro drones start on square-manhole launch pads."
+  ]
+  title "OFF TOUR savannah"
+  basicTimeStep 8
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
+}
+Viewpoint {
+  orientation -0.35 0.02 0.94 2.15
+  position 18 -28 14
+  near 0.2
+  follow "ranger_eye"
+  followSmoothness 0.2
+}
+Background {
+  skyColor [
+    0.53 0.7 0.88
+    0.86 0.76 0.5
+  ]
+  luminosity 1.15
+}
+DirectionalLight {
+  direction -0.35 -0.45 -1
+  intensity 2.6
+  ambientIntensity 1
+  castShadows TRUE
+}
+SavannahRange {
+  translation -40 -40 0
+  name "savannah_range"
+  size 80 80
+  relief 6
+  randomSeed 2
+}
+SquareManhole {
+  translation 0 1.1 0.04
+  name "launch_pad_ranger"
+  size 1.6 1.6 0.08
+}
+SquareManhole {
+  translation 0 -1.1 0.04
+  name "launch_pad_thermal"
+  size 1.6 1.6 0.08
+}
+Mavic2ProLocal {
+  translation 0 1.1 0.16
+  name "ranger_eye"
+  controller "ranger_eye"
+  controllerArgs [
+    "ranger"
+  ]
+  cameraSlot [
+    Camera {
+      width 400
+      height 240
+      near 0.2
+      recognition Recognition {
+        maxRange 80
+      }
+    }
+  ]
+}
+Mavic2ProLocal {
+  translation 0 -1.1 0.16
+  rotation 0 0 1 0.4
+  name "thermal_watch"
+  controller "ranger_eye"
+  controllerArgs [
+    "thermal"
+  ]
+  cameraSlot [
+    Camera {
+      width 400
+      height 240
+      near 0.2
+      recognition Recognition {
+        maxRange 80
+      }
+    }
+  ]
+}

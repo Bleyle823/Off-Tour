@@ -1,0 +1,52 @@
+#VRML_SIM R2025a utf8
+# Flat-topped acacia for the OFF TOUR savannah.
+
+PROTO Acacia [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 0 1 0
+  field SFString   name         "acacia"
+  field SFFloat    canopy       4
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    children [
+      Pose {
+        translation 0 0 2.7
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.35 0.22 0.12
+              roughness 0.9
+            }
+            geometry Cylinder {
+              height 5.4
+              radius 0.18
+            }
+          }
+        ]
+      }
+      Pose {
+        translation 0 0 5.6
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.42 0.5 0.16
+              roughness 1
+            }
+            geometry Cylinder {
+              height 0.55
+              radius IS canopy
+            }
+          }
+        ]
+      }
+    ]
+    boundingObject Cylinder {
+      height 6
+      radius 0.3
+    }
+  }
+}

@@ -1,0 +1,66 @@
+#VRML_SIM R2025a utf8
+# Dry-season bushfire for OFF TOUR. Recognition model is "bushfire".
+
+PROTO BushFire [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 0 1 0
+  field SFString   name         "bushfire"
+  field SFFloat    intensity    6
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    model "bushfire"
+    recognitionColors [
+      1 0.35 0
+    ]
+    children [
+      Shape {
+        appearance PBRAppearance {
+          baseColor 0.12 0.07 0.02
+          roughness 1
+          metalness 0
+        }
+        geometry Cylinder {
+          height 0.12
+          radius 1.6
+        }
+      }
+      Pose {
+        translation 0 0 0.9
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 1 0.32 0
+              emissiveColor 1 0.22 0
+              roughness 1
+              metalness 0
+            }
+            geometry Cone {
+              bottomRadius 0.85
+              height 1.8
+            }
+          }
+        ]
+      }
+      Pose {
+        translation 0 0 1.4
+        children [
+          PointLight {
+            color 1 0.4 0.05
+            intensity IS intensity
+            attenuation 0 0 0.05
+            radius 18
+            castShadows FALSE
+          }
+        ]
+      }
+    ]
+    boundingObject Cylinder {
+      height 2
+      radius 1.2
+    }
+  }
+}
