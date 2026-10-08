@@ -1,4 +1,4 @@
-# Off-Safari
+# Off-Tour 
 
 **Tele-present safari.** A KCAA-licensed, ranger-supervised, mostly autonomous drone that
 watches wildlife in Nairobi National Park from a respectful distance, while people anywhere
