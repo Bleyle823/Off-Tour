@@ -1,4 +1,4 @@
-# Off-Safari: Project Plan
+# OFF TOUR: Project Plan
 
 ## 1. Vision and principles
 
@@ -19,7 +19,7 @@ neighbours.
 
 ## 2. Users and what they get
 
-| User | Job to be done | What Off-Safari gives them |
+| User | Job to be done | What OFF TOUR gives them |
 | --- | --- | --- |
 | **Remote participant** (diaspora, students, wildlife fans) | See and learn about the park without travelling | A live or near-live session, a "remote seat" to pan and zoom, a guide's commentary, a signed souvenir clip |
 | **Schools in Nairobi and Kenya** | Reach a park most pupils never visit | Scheduled classroom sessions at a low or sponsored price |
@@ -32,7 +32,8 @@ neighbours.
 
 1. **Ranger Eye (license to operate).** Conservation-first flights run or supervised by KWS.
    Earns little directly, but it is what makes the park willing to host the rest. Includes
-   thermal patrols and counts.
+   thermal patrols, fence and snare patrols, census transects, HWC buffers, and forest /
+   bushfire hotspot detection (see `docs/CONSERVATION-APPLICATIONS.md`).
 2. **School and Remote Seat sessions (core public product).** Pre-booked 20-30 minute sessions.
    The drone flies an autonomous route along pre-approved corridors at stand-off distance; a
    KCAA-licensed pilot monitors; remote participants steer the camera within a safe envelope

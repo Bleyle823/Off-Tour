@@ -22,7 +22,7 @@ def main() -> None:
     claim = registry.create(
         claim_id="claim-001",
         buyer_id="did:peaq:buyer-school-001",
-        seller_machine_id="did:peaq:offsafari-drone-001",
+        seller_machine_id="did:peaq:offtour-drone-001",
         price_usdc_cents=2500,
         deadline_iso="2026-10-15T10:00:00Z",
         buyer_stake_cents=100,

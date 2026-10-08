@@ -2,6 +2,8 @@
 
 ## Done in repo
 - Stand-off envelope, flight log chain, mock escrow session, camera intents, redaction policy, revenue split demo.
+- Conservation mission catalog (incl. forest fire detection), `sim/conservation/`, park config stubs.
+- Webots savannah world with two Mavic patrol drones and bushfire alerts (`webots/worlds/off_tour_savannah.wbt`).
 
 ## Week 1-2
 1. **Regulatory:** retain Kenyan aviation counsel; email KWS Nairobi National Park warden with Ranger Eye proposal (template in `templates/kws-intro.md` when added).

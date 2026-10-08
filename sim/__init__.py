@@ -1,1 +1,1 @@
-"""Off-Safari simulation and product logic (no flight hardware)."""
+"""OFF TOUR simulation and product logic (no flight hardware)."""

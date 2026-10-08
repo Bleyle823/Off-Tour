@@ -11,7 +11,7 @@ failed network call can cancel a booking; it can never affect flight safety.
 
 ## 2. Mapping to peaqOS functions
 
-| peaqOS function | Use in Off-Safari | Status in the docs | What we do |
+| peaqOS function | Use in OFF TOUR | Status in the docs | What we do |
 | --- | --- | --- | --- |
 | **Activate** | Each aircraft gets a peaqID, wallet and Machine NFT. Bond $PEAQ per Economics 2.0 | Live. Registration was marked paused when researched | Check status; use agung testnet first |
 | **Scale** | The aircraft's paired agent buys charging, compute (species ID), connectivity; spend limits per transaction and per day; x402 for micro-payments | Live | Pair an agent with a strict delegation policy; community charging pad splits revenue |

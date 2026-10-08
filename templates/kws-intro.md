@@ -4,7 +4,7 @@
 
 Dear [Warden / Park Management],
 
-We are writing to propose **Off-Safari**, a conservation-first unmanned aircraft programme
+We are writing to propose **OFF TOUR**, a conservation-first unmanned aircraft programme
 designed to support KWS rangers—not replace them—with stand-off wildlife monitoring,
 fence-line checks, and signed data for patrol planning.
 

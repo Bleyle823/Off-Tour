@@ -1,4 +1,4 @@
-"""Stand-off safety envelope for Off-Safari.
+"""Stand-off safety envelope for OFF TOUR.
 
 Pure functions, no dependencies. The envelope outranks the pilot's route, the
 autonomy planner and every remote request. Remote participants never reach this
