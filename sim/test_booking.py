@@ -24,6 +24,12 @@ class SessionTests(unittest.TestCase):
 
 
 class RedactionTests(unittest.TestCase):
+    def test_fire_alert_redacted_for_public(self):
+        raw = {"event": "fire_alert", "level": "warning", "lat": -1.0, "lon": 36.0}
+        pub = red.build_fire_alert_package(raw, "public")
+        self.assertEqual(pub["location"], "redacted")
+        self.assertNotIn("lat", pub)
+
     def test_rhino_coords_stripped_for_public(self):
         raw = {"species": "black_rhino", "lat": -1.0, "lon": 36.0}
         pub = red.build_detection_package(raw, "public")

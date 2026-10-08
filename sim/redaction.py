@@ -50,5 +50,19 @@ def build_detection_package(
     return out
 
 
+def build_fire_alert_package(raw: Dict[str, Any], audience: str) -> Dict[str, Any]:
+    """Fire and bushfire alerts are never released to public or Remote Seat audiences."""
+    if audience in ("public", "participant", "guide"):
+        return {
+            "event": "fire_alert",
+            "location": "redacted",
+            "level": raw.get("level"),
+            "delay_minutes": 9999,
+        }
+    out = deepcopy(raw)
+    out["ranger_only"] = True
+    return out
+
+
 def package_manifest(packages: List[Dict[str, Any]]) -> Dict[str, Any]:
     return {"count": len(packages), "species": sorted({p.get("species") for p in packages})}
