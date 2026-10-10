@@ -1,6 +1,41 @@
 __pycache__/
 *.pyc
 .venv/
+venv/
+
+# Secrets and credentials (never commit)
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.local
+**/config/wallets.json
+**/config/peaqos_wallets.json
+**/config/bridge.json
+**/entity-secret*
+**/*recovery*
+**/credentials.json
+**/*.pem
+**/*.key
+**/turnkey*
+**/webhook-secret*
+
+# Local IDE / agent tooling
+.cursor/
+.agents/
+skills-lock.json
+
+# Webots MCP controllers (local copies; may hold session paths)
 webots/controllers/mcp_bridge/
 webots/controllers/mcp_robot/
 webots/worlds/*.bak
+webots/camera_check.png
+
+# Node / Runway scripts
+scripts/runway/node_modules/
+scripts/runway/.env
+
+# Large or local-only terrain assets (regenerate with planning pipeline)
+maps/Colorado2/
+**/WEBOTS_elevations.wbo
+webots_moose/protos/textures/TerrainFeaturesScaled.png
