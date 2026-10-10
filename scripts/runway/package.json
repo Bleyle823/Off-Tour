@@ -1,0 +1,12 @@
+{
+  "name": "off-safari-runway",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "image-to-video": "node image-to-video.mjs",
+    "text-to-video": "node text-to-video.mjs"
+  },
+  "dependencies": {
+    "@runwayml/sdk": "^2.0.0"
+  }
+}

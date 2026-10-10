@@ -34,6 +34,7 @@ webots/camera_check.png
 # Node / Runway scripts
 scripts/runway/node_modules/
 scripts/runway/.env
+scripts/copy_sassafras_forest.py
 
 # Large or local-only terrain assets (regenerate with planning pipeline)
 maps/Colorado2/
