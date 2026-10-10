@@ -1,66 +1,47 @@
 # Compliance checklist
 
-> Not legal advice. Rules change; one source below is a secondary summary. Confirm every item
-> with KCAA, KWS, Kenya Airports Authority and a Kenyan aviation lawyer before any flight.
+> Not legal advice. Rules change. Confirm every item with KWS, park management, and Kenyan
+> counsel before any vehicle operates in a protected area or any commercial filming starts.
 
-## A. Aviation (KCAA)
+OFF TOUR is a **ground** product: an autonomous Clearpath Moose on designated tourist
+self-drive paths. It is trained on that circuit and drives it by itself. There is no driver
+aboard. It does not fly. Aerial unmanned aircraft are not the operating plan.
 
-Status of rules: the 2020 Civil Aviation (Unmanned Aircraft Systems) Regulations and KCAA's
-Manual of Implementing Standards are the published baseline. A secondary source (AfriScan,
-reviewed 27 Sept 2026) says they were replaced by the Civil Aviation (Unmanned Aircraft
-Systems) Regulations, 2025 (Legal Notice No. 40 of 2026, 6 March 2026). Verify which is in
-force.
+## A. Park access and vehicle operation (KWS)
 
-| Item | What the sources say | Our action |
+| Item | What we know | Our action |
 | --- | --- | --- |
-| Operator certificate | Commercial work needs a Remote Aircraft Operator Certificate; the secondary source says only for a Kenyan-registered company with security clearance, valid 24 months | Partner with or become a certificated Kenyan operator |
-| Per-operation authorization | KCAA authorizes operations; the secondary source says apply at least 90 days ahead (verify) | Plan lead time into every milestone |
-| Remote pilot licence | Required, with medical certificate and ratings | Use licensed pilots as pilot in command |
-| Category | Category A: visual line of sight, max 400 ft, under 25 kg. Category C: higher risk, can include BVLOS, needs a certificate of airworthiness based on the type certificate | Start Category A, VLOS from a ranger post or vehicle; BVLOS only after approval |
-| Near aerodromes | Written permission from the aerodrome operator, the air navigation provider and KCAA within 10 km of code C-F aerodromes and 7 km of code A-B aerodromes, and on approach and take-off paths | Map the park against JKIA and Wilson; seek written permission for a defined zone and window |
-| Controlled airspace | Flight plans required; ATC notification when operating near launch area | Build ATC coordination into the operations manual |
-| Risk assessment | The manual requires one per operation type, explicitly listing national parks and aerodromes | Write it in Phase 0 |
-| Autonomous flight | Allowed only as prescribed by the authority (secondary source) | Keep pilot in command; autonomy within a geofence |
-| Insurance | Typically required for approvals | Quote early; MCR history may help later |
+| Written authorization | Commercial activity, filming, and research equipment in a national park need KWS permission. Nairobi National Park rules prohibit disturbing wildlife. | Do not enter the park until a written approval names the circuit, hours, and vehicle. |
+| Stay on designated roads | The park already has self-drive and guided game-drive roads. Off-road driving damages habitat and is not part of this product. | Hard path geofence in software. If the corridor is left, the rover stops and may only resume on the trained path. No bush driving. |
+| Wildlife welfare | No baiting, chasing, or harassment. Equipment can be confiscated on violation. | Viewing-distance and speed rules in `sim/proximity.py`, agreed with KWS scientists before live use. |
+| Fees | Park entry and commercial filming fees apply. Confirm the current schedule with KWS; do not assume a drone-day tariff. | Budget park and filming fees as a cost line, not an aviation charge. |
+| Vehicle on park roads | The reference vehicle drives the trained tourist circuit by itself. Insurance, a machine that can stop and yield, and written park approval are still required. Counsel and KWS have to confirm that an uncrewed vehicle is permitted on that road. | No driver rides in the vehicle. Remote guests never steer. Path and viewing-distance rules outrank the autonomy. |
+| Insurance | Operators of commercial activity are expected to carry appropriate cover. | Quote early; Machine Credit Rating history may help later. |
 
-## B. Park rules (KWS)
+## B. Wildlife welfare protocol (draft, to agree with KWS scientists)
 
-- Drones are not allowed in Nairobi National Park without explicit written authorization from
-  KWS and the relevant aviation authorities. Commercial filming needs prior KWS permission.
-- KWS conservation-fee schedule (October 2025) lists drone charges of KSh 5,000 per drone per
-  day for East African citizens and US$300 for non-residents; KCAA licences are required.
-- No baiting, chasing or disturbance of wildlife. Equipment can be confiscated on violation.
-
-## C. Wildlife welfare protocol (draft, to agree with KWS scientists)
-
-1. No flights in the rhino sanctuary. No live public feed of any rhino location.
-2. Default stand-off: at least 100 m horizontal and at least 60 m above ground level from any
-   animal, higher near nesting birds (reviews suggest 80 m or more) and for the most sensitive
-   species. These figures come from published studies and are starting points; tune with
-   local measurement.
-3. Take off at least 100 m from the animals and approach slowly (the elephant protocol used
-   2 m/s at 45 degrees or less; no elephants live in this park, but slow, shallow approaches
-   are a sensible default).
-4. Mandatory withdrawal: if animals show alertness, agitation or movement away, the aircraft
-   climbs or retreats automatically and the pilot is alerted.
-5. Daily time limits per area, quiet periods around dawn and dusk when many animals move, and
-   a cap on flights per day.
+1. No driving into the rhino sanctuary. No live public feed of any rhino location.
+2. Default viewing distance: stop at least 40 m from an animal before a remote guest is invited to look, and farther for sensitive species. These figures are starting points for a ground vehicle on a road, not aerial stand-off numbers. Tune them with local measurement.
+3. Approach along the road only, at a low speed. When wildlife is inside the near radius, cap speed (creep or stop). Do not leave the tarmac or graded track to get a better angle.
+4. Mandatory withdrawal: if animals show alertness, agitation, or movement away, the rover backs along the road or holds, and the ranger console is alerted. The remote camera is frozen until the envelope is clear.
+5. Daily time limits per circuit, quiet periods around dawn and dusk when many animals move, and a cap on sessions per day.
 6. Independent review of the disturbance data; publish results.
 
-## D. Privacy and data
+## C. Privacy and data
 
-- Do not image people without written consent (UAS regulations). Blur or drop people and
-  vehicle interiors at the edge, before signing or streaming.
+- Blur or drop people and other visitors' vehicle interiors at the edge, before signing or streaming. Do not publish identifiable guests.
 - Respect the Kenya Data Protection Act as applicable; appoint a data protection lead.
-- Wildlife location data is sensitive: redact coordinates for protected species, delay
-  releases, and grant access per buyer.
+- Wildlife location data is sensitive: redact coordinates for protected species, delay releases, and grant access per buyer.
 
-## E. Payments and ownership
+## D. Payments and ownership
 
-- Check Kenyan rules on virtual assets and on selling interests in revenue-sharing assets
-  before any mainnet launch or share sale.
+- Check Kenyan rules on virtual assets and on selling interests in revenue-sharing assets before any mainnet launch or share sale.
 - Stablecoin on- and off-ramps must go through licensed providers.
 - Keep the community vault on testnet until counsel signs off.
+
+## E. Retired approach (not in the product)
+
+An earlier draft of OFF TOUR used multirotor drones, KCAA unmanned-aircraft rules, and stand-off altitudes drawn from aerial wildlife studies. That path is retired. Drones disturb animals, and Nairobi National Park sits against constrained airspace. Those sources remain in `docs/SOURCES.md` marked superseded so the research trail is honest. Do not plan flights, remote-pilot licences, or per-drone park fees for v1.
 
 ## F. Sources
 

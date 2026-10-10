@@ -5,19 +5,19 @@ onchain machines. Where the docs and blogs disagree or a piece is not shipped, i
 
 ## 1. Principle: nothing safety-critical waits on a chain
 
-Flight control, stand-off enforcement and kill switches run on the aircraft and at the ground
-station. peaq handles identity, bookings, payment, signed data, permissions and ratings. A
-failed network call can cancel a booking; it can never affect flight safety.
+Drive control, path-geofence enforcement, proximity limits and the emergency stop run on the
+rover. peaq handles identity, bookings, payment, signed data, permissions
+and ratings. A failed network call can cancel a booking; it can never move the vehicle.
 
 ## 2. Mapping to peaqOS functions
 
 | peaqOS function | Use in OFF TOUR | Status in the docs | What we do |
 | --- | --- | --- | --- |
-| **Activate** | Each aircraft gets a peaqID, wallet and Machine NFT. Bond $PEAQ per Economics 2.0 | Live. Registration was marked paused when researched | Check status; use agung testnet first |
-| **Scale** | The aircraft's paired agent buys charging, compute (species ID), connectivity; spend limits per transaction and per day; x402 for micro-payments | Live | Pair an agent with a strict delegation policy; community charging pad splits revenue |
-| **Stream** | Edge Agent signs, encrypts and chunks detections and footage; Data Event Map redacts fields; buyers get access grants | Live. Buyer purchase routes return 404 today. Edge Agent is a ROS 2 node, which suits a PX4 or ArduPilot companion computer | Build signing and redaction now; mock the purchase step and label it |
-| **Qualify** | Machine Credit Rating from flight, payment and data events | Live | Submit events with the highest honest trust level; hardware-signed weighs most |
-| **Verify** | Chip attestation that the aircraft's secure element is genuine | Beta; one chip family (Infineon OPTIGA Trust M Express), peaq mainnet only | Consider later; not required for v1 |
+| **Activate** | Each rover gets a peaqID, wallet and Machine NFT. Bond $PEAQ per Economics 2.0 | Live. Registration was marked paused when researched | Check status; use agung testnet first |
+| **Scale** | The rover's paired agent buys charging, compute (species ID), connectivity; spend limits per transaction and per day; x402 for micro-payments | Live | Pair an agent with a strict delegation policy; community charging splits revenue |
+| **Stream** | Edge Agent signs, encrypts and chunks detections and footage; Data Event Map redacts fields; buyers get access grants | Live. Buyer purchase routes return 404 today. Edge Agent is a ROS 2 node, which suits a companion computer on the rover | Build signing and redaction now; mock the purchase step and label it |
+| **Qualify** | Machine Credit Rating from patrol, payment and data events | Live | Submit events with the highest honest trust level; hardware-signed weighs most |
+| **Verify** | Chip attestation that the rover's secure element is genuine | Beta; one chip family (Infineon OPTIGA Trust M Express), peaq mainnet only | Consider later; not required for v1 |
 | **Monetize** | Selling spare compute | v1 is compute only via Akash | Not used |
 | **Tokenize** | Fractional ownership | Not shipped | Build our own vault (see section 6) |
 
@@ -26,17 +26,17 @@ failed network call can cancel a booking; it can never affect flight safety.
 Based on the Escrow docs: ClaimRegistry on peaq, BaseEscrow on Base, LayerZero relaying funding
 and completion, claim states Created, Accepted, Funded, Completed.
 
-1. **Register.** The drone's agent card (ERC-8004) and the buyer's identity exist on peaq.
+1. **Register.** The rover's agent card (ERC-8004) and the buyer's identity exist on peaq.
 2. **Create claim.** The participant (or a school, sponsor or operator on their behalf) creates
-   a purchase claim on peaq naming the aircraft as seller, with the session price and a
+   a purchase claim on peaq naming the rover as seller, with the session price and a
    deadline. Both sides lock a stake.
-3. **Accept.** The operator's agent accepts after checking that an approved flight window,
-   weather, pilot and aircraft are available. Claim becomes Accepted.
+3. **Accept.** The operator's agent accepts after checking that an approved circuit window,
+   weather, the trained path, and the rover are available. Claim becomes Accepted.
 4. **Fund.** The buyer deposits stablecoin into BaseEscrow on Base. LayerZero relays it; the
    claim becomes Funded on peaq.
-5. **Fly.** The session runs under pilot command. The Edge Agent signs the flight log and data
-   chunks.
-6. **Validate.** A KWS ranger or the pilot in command posts an attestation (Validation
+5. **Drive.** The rover follows the trained path by itself. There is no driver aboard. The Edge Agent
+   signs the patrol log and data chunks.
+6. **Validate.** A KWS ranger posts an attestation (Validation
    Registry) that the session was delivered inside the approved envelope.
 7. **Release.** Payment releases on Base and completion syncs to peaq; stakes return. The docs
    describe the buyer calling release; the Escrow blog says the seller does. Read the contract
@@ -51,14 +51,14 @@ abort mid-session (partial delivery rules), and disputes (freeze, human resoluti
 
 ## 4. Permits as checkable facts
 
-KWS and KCAA remain the legal authorities; the chain only makes their approvals easy to check.
+KWS remains the legal authority for park use; the chain only makes approvals easy to check.
 Pattern, which the "access control: clearance before takeoff" idea in the peaqOS blog
-describes (air zoning is something partners build, not a peaq product):
+describes (partners build the gate, not a peaq product):
 
-- The authority issues a signed permit for aircraft X, zone Y, window Z.
+- The authority issues a signed permit for rover X, circuit Y, window Z.
 - A validation record points to it on peaq.
-- The ground station checks the record before arming, and the aircraft refuses to arm outside
-  the permit. Paper permits still apply in parallel.
+- The ranger console checks the record before the session starts, and the rover refuses to
+  leave the staging point outside the permit. Paper permits still apply in parallel.
 
 ## 5. Data policy (Stream Data Event Map)
 
@@ -71,10 +71,10 @@ The Edge Agent applies field rules before signing: `include`, `exclude`, `encryp
 | Coordinates for rhino and other protected species | encrypt, release delayed | KWS only |
 | Coordinates for common species | coarsened | Guides, after a delay |
 | People and vehicle interiors | drop or blur before signing | Nobody |
-| Flight log (distance, altitude, aborts) | include | KWS, regulators, public summary |
+| Patrol log (distance, speed, path exits, aborts) | include | KWS, regulators, public summary |
 | Raw video | encrypt | KWS and the booking participant |
 
-Signing proves which aircraft produced the data and that it was not altered; it does not prove
+Signing proves which rover produced the data and that it was not altered; it does not prove
 the animal was where the label says. Add validator checks and ranger spot-audits.
 
 ## 6. Community co-ownership
@@ -83,7 +83,7 @@ peaq's Tokenize is not shipped. Under Economics 2.0 the Machine NFT is an ERC-72
 ID is the machine ID, and transferring it transfers ownership of the machine. The same vault
 pattern planned for the sibling `moonad` project applies:
 
-1. Lock the aircraft's Machine NFT in a vault contract.
+1. Lock the rover's Machine NFT in a vault contract.
 2. Issue ERC-20 shares to the community and operator.
 3. Deposit session revenue; distribute pro rata with accounting that follows share transfers.
 
@@ -100,10 +100,10 @@ an integration to scope with a provider, not a feature that exists.
 
 | Piece | Phase 0 |
 | --- | --- |
-| Stand-off envelope, flight log | Real code (`sim/`) |
+| Path and proximity envelope, patrol log | Real code (`sim/proximity.py`, `sim/patrol_log.py`) |
 | peaqID and wallet on agung | Real |
 | Escrow booking | Real on agung and Base testnets if registration allows; else mocked |
 | Data signing and redaction | Real signing; mocked buyer purchase |
 | Permit attestation | Mocked authority key |
 | Vault payout | Real contract on testnet |
-| Aircraft, detector, link | Simulated |
+| Rover, detector, link | Simulated |
