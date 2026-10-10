@@ -1,0 +1,124 @@
+#VRML_SIM R2025a utf8
+# Textured body + hinge legs (motors are direct children of the Robot).
+
+EXTERNPROTO "AnimalMeshVisual.proto"
+
+PROTO GrazingWalker [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 0 1 0
+  field SFString   name         "grazer"
+  field SFString{"horse", "deer", "cow"}
+                   species      "horse"
+  field SFFloat    scale        1
+]
+{
+  %<
+    const s = fields.species.value;
+    const sc = fields.scale.value;
+    let fwd = 0.34 * sc;
+    let spread = 0.21 * sc;
+    let thigh = 0.27 * sc;
+    let shin = 0.31 * sc;
+    let legR = 0.042 * sc;
+    let bodyLift = 0.36 * sc;
+    let legColor = '0.34 0.23 0.14';
+    if (s === 'deer') {
+      fwd = 0.28 * sc; spread = 0.17 * sc; thigh = 0.22 * sc; shin = 0.26 * sc;
+      legR = 0.032 * sc; bodyLift = 0.30 * sc; legColor = '0.42 0.31 0.2';
+    }
+    if (s === 'cow') {
+      fwd = 0.31 * sc; spread = 0.23 * sc; thigh = 0.26 * sc; shin = 0.29 * sc;
+      legR = 0.048 * sc; bodyLift = 0.34 * sc; legColor = '0.28 0.26 0.22';
+    }
+    const rlFwd = -fwd * 0.92;
+    const legs = [
+      {id: 'fl', x: fwd, y: spread},
+      {id: 'fr', x: fwd, y: -spread},
+      {id: 'rl', x: rlFwd, y: spread},
+      {id: 'rr', x: rlFwd, y: -spread},
+    ];
+  >%
+  Robot {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    controller "herd_gait"
+    children [
+      Solid {
+        name "animal_body"
+        model %<= '"' + s + '"' >%
+        children [
+          Transform {
+            translation 0 0 %<= bodyLift >%
+            children [
+              AnimalMeshVisual {
+                species %<= '"' + s + '"' >%
+                scale %<= sc >%
+              }
+            ]
+          }
+        ]
+      }
+      %< for (let i = 0; i < legs.length; ++i) {
+        const L = legs[i];
+      >%
+      HingeJoint {
+        jointParameters HingeJointParameters {
+          axis 1 0 0
+          anchor %<= L.x >% %<= L.y >% 0
+        }
+        device [
+          RotationalMotor {
+            name %<= '"leg_' + L.id + '_thigh"' >%
+            maxVelocity 6
+          }
+        ]
+        endPoint Solid {
+          name %<= '"leg_' + L.id + '_upper"' >%
+          translation 0 0 %<= -thigh >%
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor %<= legColor >%
+                roughness 0.88
+              }
+              geometry Capsule {
+                height %<= thigh >%
+                radius %<= legR >%
+              }
+            }
+            HingeJoint {
+              jointParameters HingeJointParameters {
+                axis 1 0 0
+                anchor 0 0 %<= -thigh >%
+              }
+              device [
+                RotationalMotor {
+                  name %<= '"leg_' + L.id + '_shin"' >%
+                  maxVelocity 8
+                }
+              ]
+              endPoint Solid {
+                name %<= '"leg_' + L.id + '_lower"' >%
+                translation 0 0 %<= -shin >%
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor %<= legColor >%
+                      roughness 0.88
+                    }
+                    geometry Capsule {
+                      height %<= shin >%
+                      radius %<= legR * 0.82 >%
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+      %< } >%
+    ]
+  }
+}

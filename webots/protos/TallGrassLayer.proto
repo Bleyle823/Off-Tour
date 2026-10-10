@@ -1,0 +1,111 @@
+#VRML_SIM R2025a utf8
+# All tall-grass tufts in one template pass (avoids thousands of nested PROTO loads).
+
+PROTO TallGrassLayer [
+  field SFVec3f  translation  0 0 0
+  field SFString name         "tall_grass_layer"
+  field SFVec2f  size         80 80
+  field SFFloat  cover        0.7
+  field SFFloat  cell         1.35
+  field SFFloat  margin       6
+  field SFInt32  randomSeed   2
+  field SFInt32  maxTufts     1100
+  field MFVec3f  heightSamples []  # Optional pre-sampled (x, y, z) in range-local coords.
+]
+{
+  %<
+    import * as wbrandom from 'wbrandom.js';
+    wbrandom.seed(fields.randomSeed.value + 9001);
+    const sizeX = fields.size.value.x;
+    const sizeY = fields.size.value.y;
+    const cover = fields.cover.value;
+    const cell = fields.cell.value;
+    const margin = fields.margin.value;
+    const maxTufts = fields.maxTufts.value;
+    const samples = fields.heightSamples.value;
+    let tufts = [];
+    if (samples.length > 0) {
+      for (let i = 0; i < samples.length; ++i) {
+        const p = samples[i];
+        wbrandom.seed(fields.randomSeed.value + i * 17);
+        tufts.push({x: p.x, y: p.y, z: p.z, h: wbrandom.real(0.55, 1.05), seed: wbrandom.integer(1, 99999)});
+      }
+    } else {
+      const xCells = Math.floor((sizeX - 2 * margin) / cell);
+      const yCells = Math.floor((sizeY - 2 * margin) / cell);
+      for (let ix = 0; ix < xCells; ++ix) {
+        for (let iy = 0; iy < yCells; ++iy) {
+          if (tufts.length >= maxTufts)
+            break;
+          if (wbrandom.real(0, 1) > cover)
+            continue;
+          const x = margin + (ix + wbrandom.real(0.1, 0.9)) * cell;
+          const y = margin + (iy + wbrandom.real(0.1, 0.9)) * cell;
+          const dx = x - sizeX * 0.5;
+          const dy = y - sizeY * 0.5;
+      if (dx * dx + dy * dy < 16 * 16)
+        continue;
+      const nx = x / sizeX;
+      const ny = y / sizeY;
+      const roadHalf = 0.06;
+      const x0 = 0.35, x1 = 0.72, y0 = 0.28, y1 = 0.62;
+      const onHoriz = (Math.abs(ny - y0) <= roadHalf || Math.abs(ny - y1) <= roadHalf) && nx >= x0 - roadHalf && nx <= x1 + roadHalf;
+      const onVert = (Math.abs(nx - x0) <= roadHalf || Math.abs(nx - x1) <= roadHalf) && ny >= y0 - roadHalf && ny <= y1 + roadHalf;
+      if (onHoriz || onVert)
+        continue;
+          tufts.push({x: x, y: y, z: 0, h: wbrandom.real(0.55, 1.05), seed: wbrandom.integer(1, 99999)});
+        }
+      }
+    }
+    const bladeCount = 9;
+  >%
+  Solid {
+    translation IS translation
+    name IS name
+    children [
+      Pose {
+        children [
+      %< for (let t = 0; t < tufts.length; ++t) {
+        wbrandom.seed(tufts[t].seed);
+        const h0 = tufts[t].h;
+        const ang = wbrandom.real(0, 2 * Math.PI);
+      >%
+      Transform {
+        translation %<= tufts[t].x >% %<= tufts[t].y >% %<= tufts[t].z >%
+        rotation 0 0 1 %<= ang >%
+        children [
+          Pose {
+            children [
+              %< for (let b = 0; b < bladeCount; ++b) {
+                const a = wbrandom.real(0, 2 * Math.PI);
+                const r = wbrandom.real(0, 0.18);
+                const bh = h0 * wbrandom.real(0.75, 1.15);
+                const w = wbrandom.real(0.014, 0.02);
+              >%
+              Transform {
+                translation %<= r * Math.cos(a) >% %<= r * Math.sin(a) >% %<= bh * 0.5 >%
+                rotation 0 0 1 %<= wbrandom.real(0, 2 * Math.PI) >%
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor %<= wbrandom.real(0.38, 0.5) >% %<= wbrandom.real(0.58, 0.68) >% %<= wbrandom.real(0.16, 0.24) >%
+                      roughness 1
+                    }
+                    geometry Box {
+                      size %<= w >% %<= w >% %<= bh >%
+                    }
+                  }
+                ]
+              }
+              %< } >%
+            ]
+          }
+        ]
+      }
+      %< } >%
+        ]
+      }
+    ]
+    boundingObject NULL
+  }
+}

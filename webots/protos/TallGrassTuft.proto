@@ -1,0 +1,54 @@
+#VRML_SIM R2025a utf8
+# Clump of tall savannah grass blades (sway driven by grass_wind supervisor).
+
+PROTO TallGrassTuft [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 0 1 0
+  field SFString   name         "tall_grass"
+  field SFFloat    bladeHeight  0.7
+  field SFInt32    randomSeed   1
+]
+{
+  %<
+    import * as wbrandom from 'wbrandom.js';
+    wbrandom.seed(fields.randomSeed.value);
+    const bladeCount = 14;
+    const h = fields.bladeHeight.value;
+  >%
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    children [
+      Pose {
+        name "grass_sway"
+        children [
+          %< for (let b = 0; b < bladeCount; ++b) {
+            const a = wbrandom.real(0, 2 * Math.PI);
+            const r = wbrandom.real(0, 0.22);
+            const bh = h * wbrandom.real(0.7, 1.25);
+            const width = wbrandom.real(0.012, 0.022);
+            const shade = wbrandom.real(0.38, 0.52);
+            const green = wbrandom.real(0.55, 0.68);
+          >%
+          Transform {
+            translation %<= r * Math.cos(a) >% %<= r * Math.sin(a) >% %<= bh * 0.5 >%
+            rotation 0 0 1 %<= wbrandom.real(0, 2 * Math.PI) >%
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor %<= shade >% %<= green >% %<= wbrandom.real(0.14, 0.22) >%
+                  roughness 1
+                }
+                geometry Box {
+                  size %<= width >% %<= width >% %<= bh >%
+                }
+              }
+            ]
+          }
+          %< } >%
+        ]
+      }
+    ]
+  }
+}

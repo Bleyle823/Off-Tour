@@ -1,0 +1,94 @@
+#VRML_SIM R2025a utf8
+# Textured animal mesh (Group only — parent Solid supplies model / DEF).
+
+PROTO AnimalMeshVisual [
+  field SFString{"horse", "deer", "cow"} species "horse"
+  field SFFloat scale 1
+]
+{
+  %<
+    let sc = fields.scale.value;
+    if (sc <= 0)
+      sc = 1;
+    const s = fields.species.value;
+  >%
+  Group {
+    children [
+      Transform {
+        scale %<= sc >% %<= sc >% %<= sc >%
+        children [
+          %< if (s === 'horse') { >%
+          Shape {
+            appearance PBRAppearance {
+              metalness 0
+              baseColor 1 1 1
+              baseColorMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/horse/textures/horse_basecolor.jpg"
+              }
+              roughnessMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/horse/textures/horse_roughness.jpg"
+              }
+              occlusionMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/horse/textures/horse_occlusion.jpg"
+              }
+            }
+            geometry Mesh {
+              url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/horse/meshes/horse.obj"
+            }
+          }
+          Shape {
+            appearance PBRAppearance {
+              metalness 0
+              roughness 1
+              baseColor 1 1 1
+              baseColorMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/horse/textures/horse_hair_basecolor.png"
+              }
+            }
+            geometry Mesh {
+              url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/horse/meshes/horse_hair.obj"
+            }
+          }
+          %< } else if (s === 'deer') { >%
+          Shape {
+            appearance PBRAppearance {
+              metalness 0
+              roughness 0.7
+              baseColor 1 1 1
+              baseColorMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/deer/textures/deer_basecolor.jpg"
+              }
+              normalMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/deer/textures/deer_normal.jpg"
+              }
+            }
+            geometry Mesh {
+              url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/deer/meshes/deer.obj"
+            }
+          }
+          %< } else { >%
+          Shape {
+            appearance PBRAppearance {
+              metalness 0
+              roughness 0.7
+              baseColor 1 1 1
+              baseColorMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/cow/textures/cow_basecolor.jpg"
+              }
+              roughnessMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/cow/textures/cow_roughness.jpg"
+              }
+              normalMap ImageTexture {
+                url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/cow/textures/cow_normal.jpg"
+              }
+            }
+            geometry Mesh {
+              url "C:/Users/Omen/Desktop/webots-master/projects/objects/animals/protos/cow/meshes/cow.obj"
+            }
+          }
+          %< } >%
+        ]
+      }
+    ]
+  }
+}

@@ -2,12 +2,11 @@
 # Savannah and woodland terrain for OFF TOUR.
 # Height field follows the forest_firefighters UnevenForest Perlin noise,
 # written for Webots R2025 ENU (height along Z, no Y-up rotation).
-# West side is open savannah (acacia). East side is denser woodland (sassafras).
+# Sassafras forest (forest_firefighters style) on Perlin terrain.
 # template language: javascript
 
-EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/appearances/protos/SandyGround.proto"
-EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/objects/trees/protos/Sassafras.proto"
-EXTERNPROTO "Acacia.proto"
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "SassafrasForest.proto"
 EXTERNPROTO "BushFire.proto"
 
 PROTO SavannahRange [
@@ -20,6 +19,7 @@ PROTO SavannahRange [
 {
   %<
     import * as wbrandom from 'wbrandom.js';
+    import * as wbrotation from 'wbrotation.js';
 
     wbrandom.seed(fields.randomSeed.value);
 
@@ -59,24 +59,54 @@ PROTO SavannahRange [
       return val;
     }
 
-    const xDimension = 28;
-    const yDimension = 28;
+    function distToSeg(px, py, ax, ay, bx, by) {
+      const abx = bx - ax;
+      const aby = by - ay;
+      const ab2 = abx * abx + aby * aby;
+      let t = ab2 > 0 ? ((px - ax) * abx + (py - ay) * aby) / ab2 : 0;
+      t = Math.max(0, Math.min(1, t));
+      return Math.hypot(px - (ax + abx * t), py - (ay + aby * t));
+    }
+
+    function smoothstep(t) {
+      const c = Math.max(0, Math.min(1, t));
+      return c * c * (3 - 2 * c);
+    }
+
+    const xDimension = 48;
+    const yDimension = 48;
     const sizeX = fields.size.value.x;
     const sizeY = fields.size.value.y;
     const relief = fields.relief.value;
     const perlinSize = 128;
+    // Flat loop, then a wide verge so the banks are not cliffs.
+    const roadHalf = 0.055;
+    const verge = 0.09;
+    const shoulder = 0.2;
+    const x0 = 0.35, x1 = 0.72, y0 = 0.28, y1 = 0.62;
     let heights = [];
     for (let j = 0; j < yDimension; ++j) {
       for (let i = 0; i < xDimension; ++i) {
         const x = i / (xDimension - 1);
         const y = j / (yDimension - 1);
         let height = 0.5 * (1.0 + fBm(x, y, perlinSize, 3));
-        const dist = Math.hypot(x - 0.5, y - 0.5);
-        if (dist < 0.1)
-          height = 0;
-        else
-          height = height * (1.0 - gaussian2d(x - 0.5, y - 0.5, 1, 0, 0, 0.18, 0.18));
-        heights.push(height * relief);
+        height = height * (1.0 - gaussian2d(x - 0.5, y - 0.5, 1, 0, 0, 0.18, 0.18));
+        const dRoad = Math.min(
+          distToSeg(x, y, x0, y0, x1, y0),
+          distToSeg(x, y, x0, y1, x1, y1),
+          distToSeg(x, y, x0, y0, x0, y1),
+          distToSeg(x, y, x1, y0, x1, y1)
+        );
+        const center = Math.hypot(x - 0.5, y - 0.5);
+        let keep = 1;
+        if (dRoad <= roadHalf + verge || center < 0.1)
+          keep = 0;
+        else {
+          const roadT = (dRoad - roadHalf - verge) / shoulder;
+          const centerT = (center - 0.1) / 0.1;
+          keep = Math.min(smoothstep(roadT), smoothstep(centerT));
+        }
+        heights.push(height * keep * relief);
       }
     }
 
@@ -96,37 +126,49 @@ PROTO SavannahRange [
       return h0 * (1 - dy) + h1 * dy;
     }
 
-    let acacias = [];
-    let woods = [];
-    for (let n = 0; n < 40; ++n) {
-      const x = wbrandom.real(4, sizeX - 4);
-      const y = wbrandom.real(4, sizeY - 4);
+    const margin = 6;
+    const density = 0.009;
+    const minTreeSize = 5;
+    const maxTreeSize = 10;
+    const numberOfTree = Math.round(sizeX * sizeY * density);
+    let trees = [];
+    for (let i = 0; i < numberOfTree; ++i) {
+      const x = wbrandom.real(margin, sizeX - margin);
+      const y = wbrandom.real(margin, sizeY - margin);
       const dx = x - sizeX * 0.5;
       const dy = y - sizeY * 0.5;
-      if (dx * dx + dy * dy < 20 * 20)
+      if (dx * dx + dy * dy < 18 * 18)
+        continue;
+      const nx = x / sizeX;
+      const ny = y / sizeY;
+      const roadHalf = 0.15;
+      const x0 = 0.35, x1 = 0.72, y0 = 0.28, y1 = 0.62;
+      const onHoriz = (Math.abs(ny - y0) <= roadHalf || Math.abs(ny - y1) <= roadHalf) && nx >= x0 - roadHalf && nx <= x1 + roadHalf;
+      const onVert = (Math.abs(nx - x0) <= roadHalf || Math.abs(nx - x1) <= roadHalf) && ny >= y0 - roadHalf && ny <= y1 + roadHalf;
+      if (onHoriz || onVert)
         continue;
       const z = heightAt(x, y);
       const angle = wbrandom.real(0, 2 * Math.PI);
-      if (x < sizeX * 0.38)
-        acacias.push({x: x, y: y, z: z, angle: angle, canopy: wbrandom.real(3.2, 5.2)});
-      else if (x > sizeX * 0.68)
-        woods.push({x: x, y: y, z: z, angle: angle});
+      const treeSize = wbrandom.real(minTreeSize, maxTreeSize);
+      trees.push({x: x, y: y, z: z, angle: angle, size: treeSize});
     }
 
     const fireSavannah = {x: 14, y: 52};
     fireSavannah.z = heightAt(fireSavannah.x, fireSavannah.y);
     const fireWood = {x: 62, y: 22};
     fireWood.z = heightAt(fireWood.x, fireWood.y);
+
   >%
   Solid {
     translation IS translation
     name IS name
     children [
       Shape {
-        appearance SandyGround {
-          colorOverride 0.78 0.66 0.36
+        appearance Grass {
+          colorOverride 0.76 0.58 0.22
+          type "prickly"
           textureTransform TextureTransform {
-            scale 16 16
+            scale 20 20
           }
         }
         geometry DEF RANGE_GRID ElevationGrid {
@@ -141,18 +183,16 @@ PROTO SavannahRange [
           ]
         }
       }
-      %< for (let i = 0; i < acacias.length; ++i) { >%
-      Acacia {
-        translation %<= acacias[i].x >% %<= acacias[i].y >% %<= acacias[i].z >%
-        rotation 0 0 1 %<= acacias[i].angle >%
-        name %<= '"acacia_' + i + '"' >%
-        canopy %<= acacias[i].canopy >%
-      }
-      %< } >%
-      %< for (let i = 0; i < woods.length; ++i) { >%
-      Sassafras {
-        translation %<= woods[i].x >% %<= woods[i].y >% %<= woods[i].z >%
-        rotation 0 0 1 %<= woods[i].angle >%
+      %< for (let i = 0; i < trees.length; ++i) { >%
+      SassafrasForest {
+        translation %<= trees[i].x >% %<= trees[i].y >% %<= trees[i].z >%
+        %<
+          const rA = {x: 0, y: 0, z: 1, a: trees[i].angle};
+          const rB = {x: 1, y: 0, z: 0, a: Math.PI / 2};
+          const rotation = wbrotation.combine(rA, rB);
+        >%
+        rotation %<= rotation.x >% %<= rotation.y >% %<= rotation.z >% %<= rotation.a >%
+        size %<= trees[i].size >%
         name %<= '"sassafras_' + i + '"' >%
       }
       %< } >%

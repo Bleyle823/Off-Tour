@@ -5,7 +5,7 @@ PROTO Acacia [
   field SFVec3f    translation  0 0 0
   field SFRotation rotation     0 0 1 0
   field SFString   name         "acacia"
-  field SFFloat    canopy       4
+  field SFFloat    canopy       5
 ]
 {
   Solid {
@@ -14,7 +14,7 @@ PROTO Acacia [
     name IS name
     children [
       Pose {
-        translation 0 0 2.7
+        translation 0 0 2.4
         children [
           Shape {
             appearance PBRAppearance {
@@ -22,30 +22,50 @@ PROTO Acacia [
               roughness 0.9
             }
             geometry Cylinder {
-              height 5.4
-              radius 0.18
+              height 4.8
+              radius 0.16
             }
           }
         ]
       }
       Pose {
-        translation 0 0 5.6
+        translation 0 0 5.05
         children [
           Shape {
             appearance PBRAppearance {
-              baseColor 0.42 0.5 0.16
+              baseColor 0.38 0.46 0.14
               roughness 1
             }
             geometry Cylinder {
-              height 0.55
+              height 0.12
               radius IS canopy
             }
           }
         ]
       }
+      Pose {
+        translation 0 0 5.18
+        children [
+          Transform {
+            scale 0.72 0.72 1
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.42 0.5 0.16
+                  roughness 1
+                }
+                geometry Cylinder {
+                  height 0.08
+                  radius IS canopy
+                }
+              }
+            ]
+          }
+        ]
+      }
     ]
     boundingObject Cylinder {
-      height 6
+      height 5.5
       radius 0.3
     }
   }

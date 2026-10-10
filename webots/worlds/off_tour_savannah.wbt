@@ -1,27 +1,45 @@
 #VRML_SIM R2025a utf8
 
 EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/objects/factory/manhole/protos/SquareManhole.proto"
-EXTERNPROTO "../protos/Mavic2ProLocal.proto"
+EXTERNPROTO "../protos/Moose.proto"
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/devices/velodyne/protos/VelodyneVLP-16.proto"
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/devices/hokuyo/protos/HokuyoUtm30lx.proto"
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/devices/delphi/protos/DelphiESR.proto"
+EXTERNPROTO "C:/Users/Omen/Desktop/webots-master/projects/devices/tdk/protos/Mpu-9250.proto"
 EXTERNPROTO "../protos/SavannahRange.proto"
+EXTERNPROTO "../protos/GrazingWalker.proto"
+EXTERNPROTO "../protos/TallGrassLayer.proto"
 
 WorldInfo {
   info [
-    "OFF TOUR savannah built like forest_firefighters:"
-    "Perlin elevation, sassafras woodland on the east, open acacia savannah on the west."
-    "Two Mavic 2 Pro drones start on square-manhole launch pads."
+    "OFF TOUR savannah: dry grass, tall grass, sassafras, grazing herd."
+    "A designated dirt-road loop and one autonomous Clearpath Moose."
+    "The rover is trained on this tourist self-drive circuit and stays on it."
+    "There is no driver aboard. Remote guests would steer the camera only."
   ]
   title "OFF TOUR savannah"
   basicTimeStep 8
+  contactProperties [
+    ContactProperties {
+      material1 "moose wheel"
+      coulombFriction [
+        4
+      ]
+      frictionRotation 0 0
+      softCFM 0.00001
+      bounce 0
+    }
+  ]
   defaultDamping Damping {
-    linear 0.5
-    angular 0.5
+    linear 0.2
+    angular 0.05
   }
 }
 Viewpoint {
   orientation -0.35 0.02 0.94 2.15
   position 18 -28 14
   near 0.2
-  follow "ranger_eye"
+  follow "off_tour_rover"
   followSmoothness 0.2
 }
 Background {
@@ -35,59 +53,398 @@ DirectionalLight {
   direction -0.35 -0.45 -1
   intensity 2.6
   ambientIntensity 1
-  castShadows TRUE
+  castShadows FALSE
 }
-SavannahRange {
+DEF SAVANNAH_RANGE SavannahRange {
   translation -40 -40 0
   name "savannah_range"
   size 80 80
   relief 6
   randomSeed 2
 }
-SquareManhole {
-  translation 0 1.1 0.04
-  name "launch_pad_ranger"
-  size 1.6 1.6 0.08
+DEF SAVANNAH_TALL_GRASS TallGrassLayer {
+  translation -40 -40 0
+  name "tall_grass_layer"
+  size 80 80
+  cover 0.7
+  cell 1.45
+  margin 6
+  randomSeed 2
+  maxTufts 1100
 }
-SquareManhole {
-  translation 0 -1.1 0.04
-  name "launch_pad_thermal"
-  size 1.6 1.6 0.08
+DEF HERD_HORSE GrazingWalker {
+  translation -22 8 2.2
+  name "herd_horse"
+  species "horse"
+  scale 1.1
 }
-Mavic2ProLocal {
-  translation 0 1.1 0.16
-  name "ranger_eye"
-  controller "ranger_eye"
-  controllerArgs [
-    "ranger"
+DEF HERD_DEER GrazingWalker {
+  translation -18 14 2.4
+  name "herd_deer"
+  species "deer"
+  scale 0.95
+}
+DEF HERD_COW GrazingWalker {
+  translation -26 4 2.1
+  name "herd_cow"
+  species "cow"
+  scale 1.05
+}
+Robot {
+  translation 0 0 0
+  name "herd_supervisor"
+  controller "herd"
+  supervisor TRUE
+  synchronization TRUE
+}
+Robot {
+  translation 0 0 0
+  name "grass_wind"
+  controller "grass_wind"
+  supervisor TRUE
+  synchronization TRUE
+}
+DEF DESIGNATED_ROAD Group {
+  children [
+    Transform {
+      translation 2.8 9.6 0.04
+      children [
+        Shape {
+          appearance DEF ROAD_DIRT PBRAppearance {
+            baseColor 0.42 0.3 0.16
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 38.4 8.8 0.05
+          }
+        }
+      ]
+    }
+    Transform {
+      translation 2.8 -17.6 0.04
+      children [
+        Shape {
+          appearance USE ROAD_DIRT
+          geometry Box {
+            size 38.4 8.8 0.05
+          }
+        }
+      ]
+    }
+    Transform {
+      translation -12 -4 0.04
+      children [
+        Shape {
+          appearance USE ROAD_DIRT
+          geometry Box {
+            size 8.8 36 0.05
+          }
+        }
+      ]
+    }
+    Transform {
+      translation 17.6 -4 0.04
+      children [
+        Shape {
+          appearance USE ROAD_DIRT
+          geometry Box {
+            size 8.8 36 0.05
+          }
+        }
+      ]
+    }
   ]
-  cameraSlot [
-    Camera {
-      width 400
-      height 240
-      near 0.2
-      recognition Recognition {
-        maxRange 80
+}
+SquareManhole {
+  translation -12 14 0.04
+  name "patrol_staging"
+  size 1.6 1.6 0.08
+}
+Moose {
+  translation -12 9.6 0.38
+  rotation 0 0 1 0
+  name "off_tour_rover"
+  controller "moose_safari"
+  bodySlot [
+    Compass {
+      name "compass"
+    }
+    Pose {
+      translation 0 0 0.22
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.16 0.17 0.15
+            roughness 0.75
+            metalness 0.05
+          }
+          geometry Box {
+            size 2.2 1.2 0.7
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.72 0.38 0.58
+      children [
+        GPS {
+          name "gps"
+        }
+        Shape {
+          appearance DEF MAST_METAL PBRAppearance {
+            baseColor 0.22 0.22 0.2
+            roughness 0.45
+            metalness 0.6
+          }
+          geometry Box {
+            size 0.06 0.06 0.015
+          }
+        }
+        Pose {
+          translation 0 0 0.07
+          children [
+            Shape {
+              appearance USE MAST_METAL
+              geometry Cylinder {
+                height 0.12
+                radius 0.012
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 0.14
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.05 0.05 0.05
+                roughness 0.3
+                metalness 0.2
+              }
+              geometry Cylinder {
+                height 0.02
+                radius 0.028
+              }
+            }
+          ]
+        }
+      ]
+    }
+    Pose {
+      translation -0.35 0.42 0.575
+      children [
+        Shape {
+          appearance USE MAST_METAL
+          geometry Box {
+            size 0.04 0.03 0.008
+          }
+        }
+      ]
+    }
+    Mpu-9250 {
+      translation -0.35 0.42 0.585
+      name "imu"
+      includeInertialUnit TRUE
+    }
+    Pose {
+      translation -0.15 0 0.8
+      children [
+        Shape {
+          appearance USE MAST_METAL
+            geometry Cylinder {
+            height 0.42
+            radius 0.028
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.15 0 1.01
+      children [
+        Shape {
+          appearance USE MAST_METAL
+          geometry Cylinder {
+            height 0.012
+            radius 0.045
+          }
+        }
+      ]
+    }
+    VelodyneVLP-16 {
+      translation -0.15 0 1.05
+      name "velodyne"
+      enablePhysics FALSE
+    }
+    Pose {
+      translation 1.02 0 0.62
+      children [
+        Shape {
+          appearance USE MAST_METAL
+          geometry Box {
+            size 0.22 0.22 0.04
+          }
+        }
+      ]
+    }
+    DelphiESR {
+      translation 1.16 0 0.68
+      name "front radar"
+    }
+    Pose {
+      translation 1.02 0 0.84
+      children [
+        Shape {
+          appearance USE MAST_METAL
+          geometry Box {
+            size 0.04 0.04 0.4
+          }
+        }
+      ]
+    }
+    HokuyoUtm30lx {
+      translation 1.1 0 1.06
+      name "front lidar"
+      enablePhysics FALSE
+      resolution 360
+    }
+    Pose {
+      translation 1.05 0 0.585
+      children [
+        Shape {
+          appearance USE MAST_METAL
+          geometry Box {
+            size 0.14 0.14 0.02
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 1.05 0 0.9
+      children [
+        Shape {
+          appearance USE MAST_METAL
+            geometry Cylinder {
+            height 0.6
+            radius 0.03
+          }
+        }
+      ]
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 1.05 0 1.2
+      }
+      device [
+        RotationalMotor {
+          name "camera yaw"
+          minPosition -2.6
+          maxPosition 2.6
+          maxVelocity 1.4
+        }
+      ]
+      endPoint Solid {
+        translation 1.05 0 1.2
+        children [
+          Pose {
+            children [
+              Shape {
+                appearance USE MAST_METAL
+                geometry Cylinder {
+                  height 0.04
+                  radius 0.04
+                }
+              }
+            ]
+          }
+          Pose {
+            translation 0 0 0.08
+            children [
+              Shape {
+                appearance USE MAST_METAL
+                geometry Cylinder {
+                  height 0.12
+                  radius 0.02
+                }
+              }
+            ]
+          }
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              axis 0 1 0
+              anchor 0.1 0 0.14
+            }
+            device [
+              RotationalMotor {
+                name "camera pitch"
+                minPosition -0.6
+                maxPosition 0.45
+                maxVelocity 1.2
+              }
+            ]
+            endPoint Solid {
+              translation 0.1 0 0.14
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.1 0.1 0.1
+                    roughness 0.4
+                    metalness 0.4
+                  }
+                  geometry Box {
+                    size 0.05 0.07 0.04
+                  }
+                }
+                Pose {
+                  translation 0.04 0 0
+                  rotation 0 1 0 0.65
+                  children [
+                    Pose {
+                      translation 0 0 0.02
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.02 0.02 0.02
+                            roughness 0.25
+                            metalness 0.5
+                          }
+                          geometry Cylinder {
+                            height 0.05
+                            radius 0.016
+                          }
+                        }
+                      ]
+                    }
+                    Camera {
+                      translation 0 0 0.045
+                      name "camera"
+                      width 400
+                      height 240
+                      fieldOfView 0.9
+                      near 0.05
+                      recognition Recognition {
+                        maxRange 80
+                      }
+                      zoom Zoom {
+                        maxFieldOfView 0.9
+                        minFieldOfView 0.25
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       }
     }
   ]
 }
-Mavic2ProLocal {
-  translation 0 -1.1 0.16
-  rotation 0 0 1 0.4
-  name "thermal_watch"
-  controller "ranger_eye"
-  controllerArgs [
-    "thermal"
-  ]
-  cameraSlot [
-    Camera {
-      width 400
-      height 240
-      near 0.2
-      recognition Recognition {
-        maxRange 80
-      }
-    }
-  ]
+
+Robot {
+  translation 0 0 -10
+  name "mcp_bridge"
+  controller "mcp_bridge"
+  supervisor TRUE
 }
