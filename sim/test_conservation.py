@@ -10,7 +10,7 @@ class ConservationMissionTests(unittest.TestCase):
         ok, msg = missions.evaluate_mission_readiness(
             "nairobi_national_park",
             ConservationApp.FOREST_FIRE_DETECTION,
-            pilot_licensed=True,
+            path_plan_ref="circuit-a",
             kws_authorization_ref="kws-auth-001",
             thermal_payload_available=False,
             wind_ms=5.0,
@@ -23,7 +23,7 @@ class ConservationMissionTests(unittest.TestCase):
         ok, _ = missions.evaluate_mission_readiness(
             "nairobi_national_park",
             ConservationApp.FOREST_FIRE_DETECTION,
-            pilot_licensed=True,
+            path_plan_ref="circuit-a",
             kws_authorization_ref="kws-auth-001",
             thermal_payload_available=True,
             wind_ms=5.0,
@@ -35,7 +35,7 @@ class ConservationMissionTests(unittest.TestCase):
         ok, msg = missions.evaluate_mission_readiness(
             "nairobi_national_park",
             ConservationApp.RHINO_SURVEILLANCE,
-            pilot_licensed=True,
+            path_plan_ref="circuit-a",
             kws_authorization_ref=None,
             thermal_payload_available=True,
             wind_ms=5.0,
@@ -43,6 +43,19 @@ class ConservationMissionTests(unittest.TestCase):
         )
         self.assertFalse(ok)
         self.assertIn("KWS", msg)
+
+    def test_mission_requires_trained_path(self):
+        ok, msg = missions.evaluate_mission_readiness(
+            "nairobi_national_park",
+            ConservationApp.FOREST_FIRE_DETECTION,
+            path_plan_ref=None,
+            kws_authorization_ref="kws-auth-001",
+            thermal_payload_available=True,
+            wind_ms=5.0,
+            battery_pct=80.0,
+        )
+        self.assertFalse(ok)
+        self.assertIn("trained path", msg)
 
 
 class FireDetectionTests(unittest.TestCase):

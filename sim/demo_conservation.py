@@ -1,4 +1,4 @@
-"""Mock Ranger Eye conservation run including bushfire detection.
+"""Mock Ranger Patrol conservation run including bushfire detection.
 
 Run: python -m sim.demo_conservation
 """
@@ -10,7 +10,7 @@ import json
 from .conservation import apps, fire, missions
 from .conservation.apps import ConservationApp
 from .conservation.fire import ThermalSample
-from . import flightlog as fl
+from . import patrol_log as fl
 
 
 def main() -> None:
@@ -19,7 +19,7 @@ def main() -> None:
     ok, msg = missions.evaluate_mission_readiness(
         park,
         app,
-        pilot_licensed=True,
+        path_plan_ref="self-drive-circuit-A",
         kws_authorization_ref="kws-letter-ref-2026",
         thermal_payload_available=True,
         wind_ms=6.0,
@@ -33,7 +33,7 @@ def main() -> None:
     ]
     alerts = fire.assess_fire_from_thermal(samples, wind_ms=6.0, humidity_pct=28.0)
 
-    log = fl.FlightLog()
+    log = fl.PatrolLog()
     log.append("2026-10-08T14:00:00Z", {"event": "conservation_arm", "app": app.value, "park": park})
     for a in alerts:
         log.append(

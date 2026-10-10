@@ -1,4 +1,8 @@
-"""Remote camera intents (participants never command flight)."""
+"""Remote camera intents (participants never command the rover).
+
+Intents apply only while the proximity envelope is OK: the rover is on the
+approved path, at viewing distance, and not being told to slow or retreat.
+"""
 
 from __future__ import annotations
 
@@ -6,9 +10,9 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 try:
-    import standoff as s
+    import proximity as s
 except ModuleNotFoundError:
-    from . import standoff as s
+    from . import proximity as s
 
 
 @dataclass(frozen=True)

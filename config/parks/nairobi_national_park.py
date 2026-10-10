@@ -5,8 +5,15 @@ DISPLAY_NAME = "Nairobi National Park"
 
 # Named zones for sim / Webots (approximate placeholders).
 EXCLUSION_ZONES = [
-    {"id": "rhino_sanctuary", "note": "No flights; no public data"},
-    {"id": "jkia_approach_buffer", "note": "KCAA + KAA coordination required"},
+    {"id": "rhino_sanctuary", "note": "No entry; no public live feed"},
+]
+
+# Placeholder circuit ids. Replace with the warden's current self-drive map.
+DESIGNATED_PATHS = [
+    {
+        "id": "self_drive_circuit_a",
+        "note": "Savannah sim loop. Waypoints: config/webots/off_tour_waypoints.json. Not a KWS-approved circuit.",
+    },
 ]
 
 CONSERVATION_PRIORITIES = [

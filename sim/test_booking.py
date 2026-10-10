@@ -3,7 +3,7 @@ import unittest
 import camera as cam
 import redaction as red
 import session as sess
-import standoff as s
+import proximity as s
 import vault as v
 
 
@@ -51,9 +51,9 @@ class VaultTests(unittest.TestCase):
 class CameraEnvelopeTests(unittest.TestCase):
     def test_reject_when_retreat(self):
         ctrl = cam.CameraController()
-        drone = s.DroneState(-1.37, 36.83, 80, 90, 3)
-        animal = s.Animal(-1.37, 36.8305, "giraffe")
-        decision = s.evaluate(drone, [animal], [])
+        rover = s.RoverState(-1.37, 36.83, 0.0, True, 90)
+        animal = s.Animal(-1.37, 36.83015, "giraffe")
+        decision = s.evaluate(rover, [animal], [])
         ok, _ = ctrl.apply_intent(cam.CameraIntent(pan_delta_deg=5), decision)
         self.assertFalse(ok)
 

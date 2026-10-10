@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import FrozenSet, Tuple
 
@@ -32,8 +32,7 @@ class MissionProfile:
     app: ConservationApp
     summary: str
     data_class: DataClass
-    min_agl_m: float = 60.0
-    min_standoff_m: float = 100.0
+    min_viewing_m: float = 40.0
     requires_thermal: bool = False
     kws_only: bool = False
 
@@ -41,13 +40,13 @@ class MissionProfile:
 APP_PROFILES: Tuple[MissionProfile, ...] = (
     MissionProfile(
         ConservationApp.FENCE_PATROL,
-        "Fence integrity and breach points along park boundaries.",
+        "Fence integrity and breach points along park boundaries, from the road.",
         DataClass.RANGER_ONLY,
-        min_agl_m=50.0,
+        min_viewing_m=30.0,
     ),
     MissionProfile(
         ConservationApp.SNARE_SWEEP,
-        "Transect patrols for snares and traps (dispersal edges, river lines).",
+        "Road stops for snares and traps (dispersal edges, river lines).",
         DataClass.RANGER_ONLY,
     ),
     MissionProfile(
@@ -57,13 +56,13 @@ APP_PROFILES: Tuple[MissionProfile, ...] = (
     ),
     MissionProfile(
         ConservationApp.THERMAL_PATROL,
-        "Dawn/dusk thermal patrol complementing fixed cameras.",
+        "Dawn/dusk thermal looks from legal stopping points, complementing fixed cameras.",
         DataClass.RANGER_ONLY,
         requires_thermal=True,
     ),
     MissionProfile(
         ConservationApp.WILDLIFE_CENSUS,
-        "Repeatable transects for species counts.",
+        "Repeatable road transects for species counts.",
         DataClass.KWS_RESEARCH,
     ),
     MissionProfile(
@@ -80,16 +79,16 @@ APP_PROFILES: Tuple[MissionProfile, ...] = (
     ),
     MissionProfile(
         ConservationApp.HABITAT_RECON,
-        "Habitat, invasive species, and pollution reconnaissance.",
+        "Habitat, invasive species, and pollution reconnaissance from the circuit.",
         DataClass.KWS_RESEARCH,
-        min_agl_m=80.0,
+        min_viewing_m=50.0,
     ),
     MissionProfile(
         ConservationApp.FOREST_FIRE_DETECTION,
-        "Wildfire and bushfire hotspot detection (thermal + smoke cues).",
+        "Wildfire and bushfire hotspot detection from the patrol route (thermal + smoke cues).",
         DataClass.RANGER_ONLY,
         requires_thermal=True,
-        min_agl_m=70.0,
+        min_viewing_m=40.0,
     ),
 )
 

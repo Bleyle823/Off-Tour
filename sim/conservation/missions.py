@@ -1,4 +1,4 @@
-"""Mission readiness checks before arming a conservation flight."""
+"""Mission readiness checks before starting a conservation patrol."""
 
 from __future__ import annotations
 
@@ -33,13 +33,13 @@ def evaluate_mission_readiness(
     park_id: str,
     app: ConservationApp,
     *,
-    pilot_licensed: bool,
+    path_plan_ref: Optional[str],
     kws_authorization_ref: Optional[str],
     thermal_payload_available: bool,
     wind_ms: float,
     battery_pct: float,
 ) -> tuple[bool, str]:
-    """Gate arming for a Ranger Eye conservation mission."""
+    """Gate a Ranger Patrol conservation run. The rover follows a trained path."""
     if app not in enabled_apps_for_park(park_id):
         return False, f"{app.value} not enabled for park {park_id}"
 
@@ -47,8 +47,8 @@ def evaluate_mission_readiness(
     if profile.kws_only and not kws_authorization_ref:
         return False, "KWS written authorization required"
 
-    if not pilot_licensed:
-        return False, "licensed pilot in command required"
+    if not path_plan_ref:
+        return False, "trained path plan required"
 
     if profile.requires_thermal and not thermal_payload_available:
         return False, "thermal payload required for this mission"
@@ -59,4 +59,4 @@ def evaluate_mission_readiness(
     if battery_pct < 25.0:
         return False, "battery too low for planned mission"
 
-    return True, "cleared for conservation mission"
+    return True, "cleared for conservation patrol"
